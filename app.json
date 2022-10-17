@@ -1,5 +1,6 @@
 {
   "expo": {
+    "scheme": "jesse-app",
     "name": "jesse-app-native",
     "slug": "jesse-app-native",
     "version": "1.0.0",
@@ -14,11 +15,10 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.tantona.jesseapp"
     },
     "android": {
       "adaptiveIcon": {
