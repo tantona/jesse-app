@@ -4,7 +4,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Fuse from "fuse.js";
 import { DateTime } from "luxon";
 import { useMemo, useState } from "react";
-import { FlatList, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Button, FlatList, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
 import tw from "twrnc";
 import { useAppState } from "../hooks/appState";
@@ -24,13 +24,13 @@ export const Receipts = () => {
 
   return (
     <View style={tw`py-2 px-2 flex flex-col flex-1`}>
-      <View style={tw`flex flex-row justify-end p-3`}>
+      <View style={tw`flex flex-row justify-end py-3`}>
         <TouchableOpacity onPress={() => navigation.navigate("Datasets")}>
-          <FontAwesome5 name="file-invoice-dollar" size={22} color="gray" />
+          <Text style={tw`font-bold text-blue-500`}>Price sheets</Text>
         </TouchableOpacity>
       </View>
       <View>
-        <Text style={tw`font-bold text-xl`}>Receipts</Text>
+        <Text style={tw`font-bold text-xl mb-2`}>Receipts</Text>
         <TextInput
           clearButtonMode="always"
           placeholder="Search..."
@@ -53,7 +53,7 @@ export const Receipts = () => {
             >
               <Text style={tw`text-lg font-semibold`}>#{item.receiptNo}</Text>
               <Text style={tw`text-sm font-semibold`}>{item?.customer?.name}</Text>
-              <Text style={tw`text-sm`}>{DateTime.fromJSDate(item.created).toLocaleString()}</Text>
+              <Text style={tw`text-sm`}>{DateTime.fromISO(item.created).toLocaleString()}</Text>
             </TouchableOpacity>
           );
         }}

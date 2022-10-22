@@ -3,7 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as Contacts from "expo-contacts";
 import * as Linking from "expo-linking";
-import { useEffect } from "react";
+import { FC, useEffect } from "react";
 import { SafeAreaView, Text, View, Dimensions } from "react-native";
 import { SheetProvider } from "react-native-actions-sheet";
 import tw from "twrnc";
@@ -13,6 +13,16 @@ import { Datasets } from "./src/Screens/Datasets";
 import { Receipt } from "./src/Screens/Receipt";
 import "./src/Sheets";
 import { AppStateProvider } from "./src/hooks/appState";
+import { DefaultTheme } from "@react-navigation/native";
+
+const MyTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: "#FFFFFF",
+  },
+};
+
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
 const prefix = Linking.createURL("/");
@@ -29,7 +39,7 @@ const Root = () => {
   );
 };
 
-export default function App() {
+const App: FC = () => {
   useEffect(() => {
     (async () => {
       const { status } = await Contacts.requestPermissionsAsync();
@@ -46,6 +56,7 @@ export default function App() {
   }, []);
   return (
     <NavigationContainer<RootStackParamList>
+      theme={MyTheme}
       linking={{
         prefixes: [prefix],
         config: {
@@ -66,4 +77,6 @@ export default function App() {
       </AppStateProvider>
     </NavigationContainer>
   );
-}
+};
+
+export default App;

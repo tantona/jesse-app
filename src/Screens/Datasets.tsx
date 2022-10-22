@@ -1,14 +1,16 @@
 import * as DocumentPicker from "expo-document-picker";
-import { Button, FlatList, View, Text } from "react-native";
+import { Button, FlatList, View, Text, TouchableOpacity } from "react-native";
 import { readRemoteFile } from "react-native-csv";
 import { v4 } from "uuid";
-import { TDataset, useAppState, KEY_FORMAT } from "../hooks/appState";
+import tw from "twrnc";
+import { TDataset, useAppState, KEY_FORMAT, TPartData } from "../hooks/appState";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { DateTime } from "luxon";
 import { useNavigation } from "@react-navigation/native";
+import { FontAwesome5 } from "@expo/vector-icons";
+
 export const Datasets = () => {
   const navigation = useNavigation<any>();
-  const { setItem, removeItem } = useAsyncStorage("@datasets");
   const { datasets, addDataset } = useAppState();
   const handlePickFile = async () => {
     const resp = await DocumentPicker.getDocumentAsync();
@@ -16,47 +18,57 @@ export const Datasets = () => {
     if (resp.type === "success") {
       const r = [];
       readRemoteFile(resp.uri, {
-        // step: (results: any) => {
-        //     r.push( results.data)
-        // },
-        // transform: (row: any) => {
-        //   console.log(row);
-        //   return {
-        //     id: v4(),
-        //     name: row?.[0],
-        //     price: row?.[1],
-        //   };
-        // },
-        complete: async (results: { data: any; meta: any; errors: any }, file: any) => {
-          const dataset = results.data.map((row: any) => {
-            return {
-              id: v4(),
-              name: row?.[0],
-              price: row?.[1],
-            };
-          });
+        complete: (results: { data: any[]; meta: any; errors: any }, file: any) => {
+          addDataset({
+            id: v4(),
+            created: DateTime.now().toString(),
+            items: results.data.map<TPartData>((row: any) => {
+              let price = parseFloat(row?.[1]?.replace(/\,|\$/g, ""));
 
-          await addDataset(dataset);
+              if (!price || isNaN(price)) {
+                price = -1;
+              }
+
+              return {
+                id: v4(),
+                name: row?.[0],
+                price: price,
+              };
+            }),
+          });
         },
       });
     }
   };
   return (
-    <View>
-      <Button title="Back" onPress={() => navigation.navigate("Receipts")} />
-      <Button title="delete" onPress={() => removeItem()} />
-      <Button title="import" onPress={() => handlePickFile()} />
-      <FlatList
-        data={datasets ?? []}
-        renderItem={({ item, index }) => {
-          return (
-            <View>
-              <Text>Dataset {index + 1}</Text>
-              <Text>{item.id}</Text>
-            </View>
-          );
-        }}
-      />
+    <View style={tw`px-2`}>
+      <View style={tw`flex flex-row justify-end py-3`}>
+        <TouchableOpacity onPress={() => navigation.navigate("Receipts")}>
+          <Text style={tw`font-bold text-blue-500`}>Receipts</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View>
+        <Text style={tw`font-bold text-xl mb-2`}>Price Sheets</Text>
+
+        <FlatList
+          data={datasets ?? []}
+          renderItem={({ item, index }) => {
+            return (
+              <View style={tw`mx-2 py-2`}>
+                <Text style={tw`text-lg font-bold`}>#{index + 1}</Text>
+                <Text>Created {DateTime.fromISO(item.created).toLocaleString()}</Text>
+              </View>
+            );
+          }}
+        />
+        <TouchableOpacity
+          onPress={() => handlePickFile()}
+          style={tw`flex flex-row justify-center border border-gray-400 py-4 rounded-lg`}
+        >
+          <Text>Add Price Sheet +</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };

@@ -32,12 +32,12 @@ export const AddParts: FC<SheetProps<TPartData[]>> = (props) => {
 
   const handlePressItem = (item: TPartData) => {
     if (!selected[item.id]) {
-      setselected({ ...selected, [item.id]: item });
+      setselected({ ...selected, [item.id]: { ...item, quantity: 1 } });
       return;
     }
     const s = Object.keys(selected).reduce<Record<string, TPartData>>((acc, key) => {
       if (key !== item.id) {
-        acc[key] = item;
+        acc[key] = selected[key];
       }
       return acc;
     }, {});
@@ -54,16 +54,12 @@ export const AddParts: FC<SheetProps<TPartData[]>> = (props) => {
 
   return (
     <BaseSheet sheetId={props.sheetId}>
-      <View style={tw`flex flex-row items-center mb-4`}>
-        <View style={tw`w-1/3 font-semibold`}>
-          <Button title="Clear" onPress={() => clearSelections()} />
-        </View>
-        <View style={tw`w-1/3 flex flex-row justify-center`}>
-          <Text style={tw`text-lg font-bold`}>Add Parts</Text>
-        </View>
-        <View style={tw`w-1/3 flex flex-row justify-end`}>
-          <Button title="Done" onPress={() => handleSave()} />
-        </View>
+      <View style={tw`flex flex-row justify-between items-center mb-4`}>
+        <Button title="Clear" onPress={() => clearSelections()} />
+
+        <Text style={tw`text-lg font-bold`}>Add Parts</Text>
+
+        <Button title="Done" onPress={() => handleSave()} />
       </View>
 
       <TextInput
@@ -80,15 +76,17 @@ export const AddParts: FC<SheetProps<TPartData[]>> = (props) => {
           query !== ""
             ? fuse
                 .search(query)
-                .slice(0, 10)
+                // .slice(0, 10)
+                .filter((item) => item.item.price !== -1)
                 .map((item) => item.item)
-            : data.slice(0, 10)
+            : data
         }
         renderItem={({ item }) => {
           return (
             <TouchableOpacity style={tw`py-2 px-2 flex flex-row items-center`} onPress={() => handlePressItem(item)}>
               <FontAwesome style={tw`mr-2 text-xl`} name={selected[item.id] ? "check-circle" : "circle-o"} />
               <Text style={tw`text-lg font-semibold`}>{item.name}</Text>
+              <Text style={tw`text-lg font-semibold`}>{item.price}</Text>
             </TouchableOpacity>
           );
         }}
