@@ -15,6 +15,7 @@ import { TPartData, useAppState } from "../hooks/appState";
 import { Contact } from "expo-contacts";
 import { BaseSheet } from "./Base";
 import Dinero from "dinero.js";
+import UserAvatar from "react-native-user-avatar";
 
 export const CreateReceipt: FC<SheetProps> = (props) => {
   const { createReceipt } = useAppState();
@@ -49,7 +50,7 @@ export const CreateReceipt: FC<SheetProps> = (props) => {
 
   const openPartsModal = () => {
     SheetManager.show<TPartData[], TPartData[]>("add-parts", {
-      context: "local",
+      context: "create-receipt",
       payload: parts,
       onClose: (data) => {
         if (data) {
@@ -78,9 +79,9 @@ export const CreateReceipt: FC<SheetProps> = (props) => {
 
   return (
     <BaseSheet sheetId={props.sheetId}>
-      <SheetProvider context="local">
+      <SheetProvider context="create-receipt">
         <View style={tw`flex flex-row justify-between items-center mb-4`}>
-          <Button title="Cancel" onPress={() => handleSave()} />
+          <Button title="Cancel" onPress={() => SheetManager.hide("create-receipt")} />
           <Text style={tw`text-lg font-bold`}>Create Receipt</Text>
           <Button title="Save" onPress={() => handleSave()} />
         </View>
@@ -93,7 +94,7 @@ export const CreateReceipt: FC<SheetProps> = (props) => {
         <TouchableOpacity
           onPress={() =>
             SheetManager.show<any, any>("pick-customer", {
-              context: "local",
+              context: "create-receipt",
               onClose: (data) => {
                 if (data) {
                   setcustomer(data);
@@ -104,7 +105,7 @@ export const CreateReceipt: FC<SheetProps> = (props) => {
         >
           {customer ? (
             <View style={tw`flex flex-row items-center my-4`}>
-              <Image source={customer?.image} style={{ ...tw`mr-4`, width: 50, height: 50 }} />
+              <UserAvatar size={50} name={customer?.name} src={customer?.image?.uri} style={tw`mr-4`} />
               <View>
                 <Text style={tw`py-2 font-semibold`}>{customer?.name}</Text>
                 <Text>{customer?.phoneNumbers?.[0].number}</Text>

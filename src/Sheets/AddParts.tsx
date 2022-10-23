@@ -8,7 +8,7 @@ import { TPartData, useAppState } from "../hooks/appState";
 import { BaseSheet } from "./Base";
 
 export const AddParts: FC<SheetProps<TPartData[]>> = (props) => {
-  const { datasets } = useAppState();
+  const { priceSheets: priceSheets } = useAppState();
   const [query, setQuery] = useState("");
   const [selected, setselected] = useState<Record<string, TPartData>>(
     props.payload.reduce((acc, part) => {
@@ -16,7 +16,7 @@ export const AddParts: FC<SheetProps<TPartData[]>> = (props) => {
       return acc;
     }, {})
   );
-  const data = datasets?.[0]?.items;
+  const data = priceSheets?.[0]?.items;
 
   const fuse = useMemo(
     () =>
@@ -47,7 +47,7 @@ export const AddParts: FC<SheetProps<TPartData[]>> = (props) => {
 
   const handleSave = async () => {
     SheetManager.hide<TPartData[]>(props.sheetId, {
-      context: "local",
+      context: "create-receipt",
       payload: Object.keys(selected).map((key) => selected[key]),
     });
   };

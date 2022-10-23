@@ -5,6 +5,7 @@ import { FlatList, Image, Text, TextInput, TouchableOpacity, View } from "react-
 import { SheetManager, SheetProps } from "react-native-actions-sheet";
 import tw from "twrnc";
 import { BaseSheet } from "./Base";
+import UserAvatar from "react-native-user-avatar";
 
 export const PickCustomer: FC<SheetProps> = (props) => {
   const [query, setQuery] = useState("");
@@ -34,7 +35,7 @@ export const PickCustomer: FC<SheetProps> = (props) => {
   const handlePressItem = (contact: Contacts.Contact) => {
     SheetManager.hide<any>(props.sheetId, {
       payload: contact,
-      context: "local",
+      context: "create-receipt",
     });
   };
 
@@ -61,7 +62,8 @@ export const PickCustomer: FC<SheetProps> = (props) => {
         renderItem={({ item }) => {
           return (
             <TouchableOpacity style={tw`py-2 px-2 flex flex-row items-center`} onPress={() => handlePressItem(item)}>
-              <Image source={item.image} style={{ height: 50, width: 50 }} />
+              <UserAvatar size={50} name={item.name} src={item.image?.uri} style={tw`mr-4`} />
+
               <Text style={tw`text-lg font-semibold`}>{item.name}</Text>
             </TouchableOpacity>
           );

@@ -9,7 +9,7 @@ import { SheetProvider } from "react-native-actions-sheet";
 import tw from "twrnc";
 import { RootStackParamList } from "./src/navigation";
 import { Receipts } from "./src/Screens/Receipts";
-import { Datasets } from "./src/Screens/Datasets";
+import { PriceSheets } from "./src/Screens/PriceSheets";
 import { Receipt } from "./src/Screens/Receipt";
 import "./src/Sheets";
 import { AppStateProvider } from "./src/hooks/appState";
@@ -31,7 +31,7 @@ const Root = () => {
   return (
     <SafeAreaView style={tw`h-full`}>
       <RootStack.Navigator screenOptions={{ headerShown: false }}>
-        <RootStack.Screen name="Datasets" component={Datasets} />
+        <RootStack.Screen name="PriceSheets" component={PriceSheets} />
         <RootStack.Screen name="Receipts" component={Receipts} />
         <RootStack.Screen name="Receipt" component={Receipt} />
       </RootStack.Navigator>
@@ -62,7 +62,7 @@ const App: FC = () => {
         config: {
           initialRouteName: "Receipts",
           screens: {
-            Datasets: "Datasets",
+            PriceSheets: "PriceSheets",
             Receipts: "Receipts",
             Receipt: "Reciept",
           },

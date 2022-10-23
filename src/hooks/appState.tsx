@@ -1,4 +1,4 @@
-import { createContext, FC, PropsWithChildren, useContext, useEffect } from "react";
+import { createContext, FC, PropsWithChildren, useContext, useEffect, useMemo } from "react";
 import { create } from "twrnc";
 import { useImmerReducer } from "use-immer";
 import * as Contacts from "expo-contacts";
@@ -8,11 +8,16 @@ import { v4 } from "uuid";
 
 interface IState {
   receipts: TReceipt[];
-  datasets: TDataset[];
+  priceSheets: TPriceSheet[];
 }
 
+export type TSignature = {
+  signature: string;
+  date: string;
+};
+
 const ctx = createContext<{ state: IState; dispatch: React.Dispatch<TDispatcherAction> }>({
-  state: { receipts: [], datasets: [] },
+  state: { receipts: [], priceSheets: [] },
   dispatch: () => {},
 });
 
@@ -21,9 +26,9 @@ type TAddRecieipt = {
   data: any;
 };
 
-type TAddDataset = {
-  type: "add-dataset";
-  data: TDataset;
+type TAddPriceSheet = {
+  type: "create-priceSheet";
+  data: TPriceSheet;
 };
 
 type TCreateReceipt = {
@@ -35,24 +40,37 @@ export type TPartData = {
   id: string;
   name: string;
   price: number;
-  quantity: number;
+  quantity?: number;
 };
 
 type TDataLoaded = {
   type: "data-loaded";
   data: {
     receipts: TReceipt[];
-    datasets: TDataset[];
+    priceSheets: TPriceSheet[];
   };
 };
 
-export type TDataset = {
+export type TPriceSheet = {
   id: string;
+  category: string;
   created: string;
   items: TPartData[];
 };
 
-type TDispatcherAction = TAddRecieipt | TAddDataset | TDataLoaded | TCreateReceipt;
+type TClearData = {
+  type: "clear-data";
+};
+
+type TSaveSignature = {
+  type: "save-signature";
+  data: {
+    receiptId: string;
+    signature: TSignature;
+  };
+};
+
+type TDispatcherAction = TAddRecieipt | TAddPriceSheet | TDataLoaded | TCreateReceipt | TSaveSignature | TClearData;
 
 export type TReceipt = {
   id: string;
@@ -60,35 +78,43 @@ export type TReceipt = {
   created: string;
   customer?: Contacts.Contact;
   parts?: TPartData[];
+  signature?: TSignature;
+};
+
+const INITIAL_STATE: IState = {
+  receipts: [],
+  priceSheets: [],
 };
 
 export const KEY_FORMAT = "yyyy-dd-MM";
 export const AppStateProvider: FC<PropsWithChildren> = ({ children }) => {
   const { setItem, getItem } = useAsyncStorage("@data");
-  const [state, dispatch] = useImmerReducer<IState, TDispatcherAction>(
-    (state, action) => {
-      switch (action.type) {
-        case "add-dataset":
-          state.datasets.push(action.data);
-          return state;
+  const [state, dispatch] = useImmerReducer<IState, TDispatcherAction>((state, action) => {
+    switch (action.type) {
+      case "create-priceSheet":
+        state.priceSheets.push(action.data);
+        return state;
 
-        case "data-loaded":
-          state.datasets = action.data.datasets;
-          state.receipts = action.data.receipts;
-          return state;
+      case "data-loaded":
+        state.priceSheets = action.data.priceSheets;
+        state.receipts = action.data.receipts;
+        return state;
 
-        case "create-receipt":
-          state.receipts.push(action.data);
-          return state;
-        default:
-          return state;
-      }
-    },
-    {
-      receipts: [],
-      datasets: [],
+      case "create-receipt":
+        state.receipts.push(action.data);
+        return state;
+
+      case "save-signature":
+        state.receipts.find((s) => s.id === action.data.receiptId).signature = action.data.signature;
+        return state;
+
+      case "clear-data":
+        state = INITIAL_STATE;
+        return state;
+      default:
+        return state;
     }
-  );
+  }, INITIAL_STATE);
 
   useEffect(() => {
     getItem().then((result) => {
@@ -113,9 +139,9 @@ export const useAppState = () => {
   const { state, dispatch } = useContext(ctx);
   const { removeItem } = useAsyncStorage("@data");
 
-  const addDataset = (data: TDataset) => {
+  const createPriceSheet = (data: TPriceSheet) => {
     dispatch({
-      type: "add-dataset",
+      type: "create-priceSheet",
       data,
     });
   };
@@ -130,10 +156,32 @@ export const useAppState = () => {
       },
     });
   };
+
+  const saveSignature = (receiptId: string, signature: TSignature) => {
+    dispatch({
+      type: "save-signature",
+      data: {
+        receiptId,
+        signature,
+      },
+    });
+  };
+
+  const clear = () => {
+    removeItem();
+    dispatch({ type: "clear-data" });
+  };
+
+  const categories = useMemo(() => {
+    return new Set(state.priceSheets.map((p) => p.category));
+  }, [state.priceSheets]);
+
   return {
     ...state,
-    addDataset,
+    categories,
+    createPriceSheet,
     createReceipt,
-    clear: removeItem,
+    saveSignature,
+    clear,
   };
 };

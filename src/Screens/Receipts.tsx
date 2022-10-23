@@ -25,7 +25,7 @@ export const Receipts = () => {
   return (
     <View style={tw`py-2 px-2 flex flex-col flex-1`}>
       <View style={tw`flex flex-row justify-end py-3`}>
-        <TouchableOpacity onPress={() => navigation.navigate("Datasets")}>
+        <TouchableOpacity onPress={() => navigation.navigate("PriceSheets")}>
           <Text style={tw`font-bold text-blue-500`}>Price sheets</Text>
         </TouchableOpacity>
       </View>
@@ -59,7 +59,7 @@ export const Receipts = () => {
         }}
       />
 
-      <View style={tw`justify-end`}>
+      <View>
         <TouchableOpacity
           style={tw`flex flex-row items-center py-1 px-2`}
           onPress={() => {

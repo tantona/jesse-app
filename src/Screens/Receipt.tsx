@@ -1,65 +1,17 @@
-import { useMemo, useRef, useState } from "react";
-import { FlatList, Text, TextInput, TouchableOpacity, View, Button, Image, Dimensions } from "react-native";
+import { useMemo, useState } from "react";
+import { Button, FlatList, Image, Text, View } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
 
-import Fuse from "fuse.js";
-import tw from "twrnc";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
-import { RootStackParamList } from "../navigation";
-import { useAppState } from "../hooks/appState";
 import Dinero from "dinero.js";
-import SignatureScreen, { SignatureViewRef } from "react-native-signature-canvas";
-
-const Sign = ({ text, onOK }) => {
-  const ref = useRef<SignatureViewRef>();
-
-  // Called after ref.current.readSignature() reads a non-empty base64 string
-  const handleOK = (signature: string) => {
-    onOK(signature); // Callback from Component props
-  };
-
-  // Called after ref.current.readSignature() reads an empty string
-  const handleEmpty = () => {
-    console.log("Empty");
-  };
-
-  // Called after ref.current.clearSignature()
-  const handleClear = () => {
-    console.log("clear success!");
-  };
-
-  // Called after end of stroke
-  const handleEnd = () => {
-    ref.current.readSignature();
-  };
-
-  // Called after ref.current.getData()
-  const handleData = (data: any) => {
-    console.log("handledata", data);
-  };
-
-  return (
-    <SignatureScreen
-      ref={ref}
-      onEnd={handleEnd}
-      onOK={handleOK}
-      onEmpty={handleEmpty}
-      onClear={handleClear}
-      onGetData={handleData}
-      autoClear={false}
-      descriptionText={text}
-      trimWhitespace
-      rotated
-    />
-  );
-};
-
-const { width } = Dimensions.get("window");
+import tw from "twrnc";
+import { TSignature, useAppState } from "../hooks/appState";
+import { RootStackParamList } from "../navigation";
 
 export const Receipt = () => {
-  const { receipts } = useAppState();
+  const { receipts, saveSignature } = useAppState();
   const navigation = useNavigation();
-  const [signature, setsignature] = useState("");
+
   const route = useRoute<RouteProp<RootStackParamList, "Receipt">>();
   const receipt = receipts.find((receipt) => receipt.id === route.params.id);
 
@@ -105,18 +57,30 @@ export const Receipt = () => {
         </View>
       </View>
 
-      <View style={tw`h-full`}>
-        {signature !== "" ? (
+      <Button
+        title="Sign"
+        onPress={() =>
+          SheetManager.show<never, TSignature>("get-signature", {
+            onClose: (payload) => {
+              if (payload) {
+                saveSignature(receipt.id, payload);
+              }
+            },
+          })
+        }
+      />
+
+      {receipt?.signature !== null && (
+        <View>
+          <Text>{receipt?.signature?.date}</Text>
           <View style={{ width: "100%", paddingTop: "100%" }}>
             <Image
-              source={{ uri: signature }}
+              source={{ uri: receipt?.signature?.signature }}
               style={{ position: "absolute", left: 0, bottom: 0, right: 0, top: 0, resizeMode: "contain" }}
             />
           </View>
-        ) : (
-          <Sign text={"foo"} onOK={(signature: string) => setsignature(signature)} />
-        )}
-      </View>
+        </View>
+      )}
     </View>
   );
 };
