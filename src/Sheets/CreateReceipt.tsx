@@ -20,9 +20,6 @@ import UserAvatar from "react-native-user-avatar";
 export const CreateReceipt: FC<SheetProps> = (props) => {
   const { createReceipt } = useAppState();
   const [receiptNo, setreceiptNo] = useState("");
-  const [selected, setselected] = useState<Record<string, boolean>>({});
-  const actionSheetRef = useRef<ActionSheetRef>(null);
-
   const [customer, setcustomer] = useState<Contact>(null);
   const [parts, setparts] = useState<TPartData[]>([]);
 

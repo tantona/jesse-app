@@ -20,7 +20,7 @@ const parseResults = (row: any) => {
   return {
     id: v4(),
     name: row?.[0],
-    price: price,
+    price,
   };
 };
 
@@ -104,7 +104,6 @@ export const CreatePriceSheet: FC<SheetProps> = (props) => {
           {!createNewCategory && categories?.size > 0 ? (
             <View>
               <Picker
-                prompt="Foobar"
                 selectedValue={category}
                 onValueChange={(itemValue, itemIndex) => {
                   setcategory(itemValue);

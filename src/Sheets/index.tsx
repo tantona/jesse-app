@@ -4,8 +4,10 @@ import { CreateReceipt } from "./CreateReceipt";
 import { CreatePriceSheet } from "./CreatePriceSheet";
 import { GetSignature } from "./GetSignature";
 import { PickCustomer } from "./PickCustomer";
+import { SelectCategory } from "./SelectCategory";
 
 registerSheet("add-parts", AddParts, "create-receipt");
+registerSheet("select-category", SelectCategory, "add-parts");
 registerSheet("pick-customer", PickCustomer, "create-receipt");
 registerSheet("pick-customer", PickCustomer);
 registerSheet("create-receipt", CreateReceipt);

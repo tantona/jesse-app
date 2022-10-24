@@ -27,7 +27,6 @@ export const GetSignature: FC<SheetProps> = ({ sheetId }) => {
   };
 
   const handleConfirm = () => {
-    console.log("end");
     ref?.current?.readSignature();
   };
 
@@ -54,19 +53,11 @@ export const GetSignature: FC<SheetProps> = ({ sheetId }) => {
             </TouchableOpacity>
           </View>
           <View style={{ backgroundColor: "blue", height: "90%", flex: 1 }}>
-            <SignatureScreen
-              backgroundColor="#FFF"
-              ref={ref}
-              onOK={handleOK}
-              autoClear={false}
-              trimWhitespace
-              rotated
-            />
+            <SignatureScreen backgroundColor="#FFF" ref={ref} onOK={handleOK} autoClear={false} rotated />
           </View>
           <View
             style={{
               position: "relative",
-              // backgroundColor: "red",
               display: "flex",
               flexDirection: "row",
               justifyContent: "center",

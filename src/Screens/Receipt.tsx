@@ -1,16 +1,53 @@
-import { useMemo, useState } from "react";
-import { Button, FlatList, Image, Text, View } from "react-native";
+import { useCallback, useMemo } from "react";
+import { Button, FlatList, Image, Share, Text, TouchableOpacity, View } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
-
-import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import { RouteProp, useRoute } from "@react-navigation/native";
 import Dinero from "dinero.js";
 import tw from "twrnc";
-import { TSignature, useAppState } from "../hooks/appState";
+import { TReceipt, TSignature, useAppState } from "../hooks/appState";
 import { RootStackParamList } from "../navigation";
+import { Entypo } from "@expo/vector-icons";
+import * as Print from "expo-print";
+import { shareAsync } from "expo-sharing";
+import { DateTime } from "luxon";
+import RNHTMLtoPDF from "react-native-html-to-pdf";
+import UserAvatar from "react-native-user-avatar";
+import { BackButton } from "../components/BackButton";
+
+const receiptHTML = (receipt: TReceipt) => {
+  return `
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+  </head>
+  <body>
+    <h1>${receipt?.customer?.name}</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>name</th>
+          <th>quantity</th>
+          <th>price</th>
+        </tr>
+        </thead>
+      <tbody>
+        ${receipt?.parts.map((item) => {
+          return `<tr>
+          <td>${item.name}</td>
+          <td>${item.quantity}</td>
+          <td>${item.price}</td>
+        </tr>`;
+        })}
+      </tbody>
+    </table>
+    <img src="${receipt?.signature?.signature}" width="300" height="150"/>
+  </body>
+</html>
+`;
+};
 
 export const Receipt = () => {
   const { receipts, saveSignature } = useAppState();
-  const navigation = useNavigation();
 
   const route = useRoute<RouteProp<RootStackParamList, "Receipt">>();
   const receipt = receipts.find((receipt) => receipt.id === route.params.id);
@@ -22,13 +59,49 @@ export const Receipt = () => {
     }, Dinero({ amount: 0, currency: "USD" }));
   }, [receipt?.parts]);
 
+  const printToFile = useCallback(async () => {
+    const { uri } = await Print.printToFileAsync({ html: receiptHTML(receipt) });
+
+    await shareAsync(uri, { UTI: ".pdf", mimeType: "application/pdf", dialogTitle: "What would you like to do?" });
+  }, [receipt]);
+
+  const printToFile2 = useCallback(async () => {
+    const fileName = `receipt_${receipt.receiptNo}_${DateTime.fromISO(receipt?.created).toFormat("y-MM-dd")}`;
+
+    try {
+      const file = await RNHTMLtoPDF.convert({
+        html: receiptHTML(receipt),
+        fileName: fileName,
+        directory: "Documents",
+      });
+
+      const resp = await Share.share({
+        title: fileName,
+        url: `file://${file.filePath}`,
+      });
+      console.log(resp.action);
+    } catch (err) {
+      console.log(err);
+    }
+  }, [receipt]);
+  const width = 250;
   return (
-    <View style={tw`py-2 px-2`}>
-      <Button title="Back" onPress={() => navigation.goBack()} />
-      <Text style={tw`text-lg font-bold`}>#{receipt.receiptNo}</Text>
+    <View style={tw`p-2`}>
+      <View style={tw`flex flex-row justify-between`}>
+        <BackButton />
+        <TouchableOpacity onPress={printToFile2}>
+          <Entypo name="share-alternative" size={24} style={tw`mr-1 text-blue-600`} />
+        </TouchableOpacity>
+      </View>
+
+      {receipt?.receiptNo ? (
+        <Text style={tw`text-lg font-bold`}>#{receipt.receiptNo}</Text>
+      ) : (
+        <Text style={tw`text-lg font-bold text-gray-400`}>{receipt.id.substring(0, 8)}</Text>
+      )}
 
       <View style={tw`flex flex-row items-center my-4`}>
-        <Image source={receipt?.customer?.image} style={{ ...tw`mr-4`, width: 50, height: 50 }} />
+        <UserAvatar size={50} name={receipt?.customer?.name} src={receipt?.customer?.image?.uri} style={tw`mr-4`} />
         <View>
           <Text style={tw`py-2 font-semibold`}>{receipt?.customer?.name}</Text>
           <Text>{receipt?.customer?.phoneNumbers?.[0].number}</Text>
@@ -38,48 +111,72 @@ export const Receipt = () => {
       <View style={tw`mb-4`}>
         <View style={tw`py-4 flex flex-row`}>
           <Text style={tw`font-semibold mr-4`}>Parts</Text>
-          <Text style={tw`text-gray-400`}>Tap to edit</Text>
         </View>
         <FlatList
           data={receipt.parts}
-          renderItem={({ item }) => {
+          ListHeaderComponent={() => {
             return (
-              <View style={tw`flex flex-row justify-between py-2`}>
-                <Text>{item.name}</Text>
-                <Text>${item.price}</Text>
+              <View style={tw`flex flex-row py-2`}>
+                <Text style={tw`font-semibold w-6/12`}>Name</Text>
+                <Text style={tw`font-semibold w-3/12 text-center`}>Quantity</Text>
+                <Text style={tw`font-semibold w-3/12 text-center`}>Price</Text>
+              </View>
+            );
+          }}
+          renderItem={({ item }) => {
+            const price = Dinero({ amount: item.price * 100, currency: "USD" }).multiply(item.quantity);
+            return (
+              <View style={tw`flex flex-row py-2`}>
+                <Text style={tw`w-6/12`}>{item.name}</Text>
+                <Text
+                  style={tw`w-3/12 text-center`}
+                  // value={`${item.quantity}`}
+                  // keyboardType="number-pad"
+                  // onChangeText={(text) => handleUpdatePartQuantity(index, text ? parseInt(text) : 0)}
+                >
+                  {item.quantity}
+                </Text>
+                <Text
+                  style={tw`w-3/12 text-center`}
+                  // value={price.toFormat("")}
+                  // onChangeText={(price) => handleUpdatePartPrice(index, parseInt(price))}
+                >
+                  {price.toFormat("$0,0.00")}
+                </Text>
+              </View>
+            );
+          }}
+          ListFooterComponent={() => {
+            return (
+              <View style={tw`flex flex-row justify-between py-2 border-t border-t-gray-400`}>
+                <Text style={tw`w-9/12 font-bold`}>Total</Text>
+
+                <Text style={tw`w-3/12 font-bold text-center`}>{subtotal.toFormat("$0,0.00")}</Text>
               </View>
             );
           }}
         />
-        <View style={tw`flex flex-row justify-between py-2`}>
-          <Text>Total</Text>
-          <Text>{subtotal.toFormat("$0,0.00")}</Text>
-        </View>
       </View>
 
-      <Button
-        title="Sign"
-        onPress={() =>
-          SheetManager.show<never, TSignature>("get-signature", {
-            onClose: (payload) => {
-              if (payload) {
-                saveSignature(receipt.id, payload);
-              }
-            },
-          })
-        }
-      />
-
-      {receipt?.signature !== null && (
-        <View>
-          <Text>{receipt?.signature?.date}</Text>
-          <View style={{ width: "100%", paddingTop: "100%" }}>
-            <Image
-              source={{ uri: receipt?.signature?.signature }}
-              style={{ position: "absolute", left: 0, bottom: 0, right: 0, top: 0, resizeMode: "contain" }}
-            />
-          </View>
+      {receipt?.signature !== null ? (
+        <View style={tw`flex flex-col items-end`}>
+          <Image source={{ uri: receipt?.signature?.signature }} style={{ height: width * (281 / 738), width }} />
+          <Text>Signed: {receipt?.customer?.name}</Text>
+          <Text>Date: {DateTime.fromISO(receipt?.signature?.date).toLocaleString()}</Text>
         </View>
+      ) : (
+        <Button
+          title="Get signature"
+          onPress={() =>
+            SheetManager.show<never, TSignature>("get-signature", {
+              onClose: (payload) => {
+                if (payload) {
+                  saveSignature(receipt.id, payload);
+                }
+              },
+            })
+          }
+        />
       )}
     </View>
   );

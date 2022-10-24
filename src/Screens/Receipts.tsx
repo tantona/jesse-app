@@ -46,14 +46,19 @@ export const Receipts = () => {
         renderItem={({ item }) => {
           return (
             <TouchableOpacity
-              style={tw`py-2`}
+              style={tw`py-2 flex flex-row items-center`}
               onPress={() => {
                 navigation.navigate("Receipt", item);
               }}
             >
-              <Text style={tw`text-lg font-semibold`}>#{item.receiptNo}</Text>
-              <Text style={tw`text-sm font-semibold`}>{item?.customer?.name}</Text>
-              <Text style={tw`text-sm`}>{DateTime.fromISO(item.created).toLocaleString()}</Text>
+              <View style={tw`flex-1`}>
+                <Text style={tw`text-lg font-semibold`}>#{item.receiptNo}</Text>
+                <Text style={tw`text-sm font-semibold`}>{item?.customer?.name}</Text>
+                <Text style={tw`text-sm`}>{DateTime.fromISO(item.created).toLocaleString()}</Text>
+              </View>
+              <View>
+                {item?.signature && <FontAwesome5 name="check-circle" size={25} style={tw`text-green-600`} />}
+              </View>
             </TouchableOpacity>
           );
         }}
