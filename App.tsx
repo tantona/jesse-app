@@ -14,6 +14,7 @@ import { Receipt } from "./src/Screens/Receipt";
 import "./src/Sheets";
 import { AppStateProvider } from "./src/hooks/appState";
 import { DefaultTheme } from "@react-navigation/native";
+import { PriceSheetCategory } from "./src/Screens/PriceSheetsCategory";
 
 const MyTheme = {
   ...DefaultTheme,
@@ -32,6 +33,7 @@ const Root = () => {
     <SafeAreaView style={tw`h-full`}>
       <RootStack.Navigator screenOptions={{ headerShown: false }}>
         <RootStack.Screen name="PriceSheets" component={PriceSheets} />
+        <RootStack.Screen name="PriceSheetCategory" component={PriceSheetCategory} />
         <RootStack.Screen name="Receipts" component={Receipts} />
         <RootStack.Screen name="Receipt" component={Receipt} />
       </RootStack.Navigator>

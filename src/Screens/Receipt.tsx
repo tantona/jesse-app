@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react";
-import { Button, FlatList, Image, Share, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Button, FlatList, Image, Share, Text, TouchableOpacity, View } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import Dinero from "dinero.js";
@@ -13,6 +13,8 @@ import { DateTime } from "luxon";
 import RNHTMLtoPDF from "react-native-html-to-pdf";
 import UserAvatar from "react-native-user-avatar";
 import { BackButton } from "../components/BackButton";
+import { Swipeable } from "react-native-gesture-handler";
+import { FontAwesome5 } from "@expo/vector-icons";
 
 const receiptHTML = (receipt: TReceipt) => {
   return `
@@ -126,24 +128,42 @@ export const Receipt = () => {
           renderItem={({ item }) => {
             const price = Dinero({ amount: item.price * 100, currency: "USD" }).multiply(item.quantity);
             return (
-              <View style={tw`flex flex-row py-2`}>
-                <Text style={tw`w-6/12`}>{item.name}</Text>
-                <Text
-                  style={tw`w-3/12 text-center`}
-                  // value={`${item.quantity}`}
-                  // keyboardType="number-pad"
-                  // onChangeText={(text) => handleUpdatePartQuantity(index, text ? parseInt(text) : 0)}
-                >
-                  {item.quantity}
-                </Text>
-                <Text
-                  style={tw`w-3/12 text-center`}
-                  // value={price.toFormat("")}
-                  // onChangeText={(price) => handleUpdatePartPrice(index, parseInt(price))}
-                >
-                  {price.toFormat("$0,0.00")}
-                </Text>
-              </View>
+              <Swipeable
+                renderRightActions={() => {
+                  return (
+                    <TouchableOpacity
+                      style={tw`bg-red-500 flex items-center justify-center w-1/3`}
+                      onPress={() => {
+                        Alert.alert("Remove price sheet", "Are you sure you want to remove this price sheet?", [
+                          { text: "Cancel", style: "cancel" },
+                          { text: "Delete", style: "destructive", onPress: () => console.log("remove") },
+                        ]);
+                      }}
+                    >
+                      <FontAwesome5 name="trash-alt" size={16} style={tw`mr-1 text-white`} />
+                    </TouchableOpacity>
+                  );
+                }}
+              >
+                <View style={tw`flex flex-row py-2 bg-white`}>
+                  <Text style={tw`w-6/12`}>{item.name}</Text>
+                  <Text
+                    style={tw`w-3/12 text-center`}
+                    // value={`${item.quantity}`}
+                    // keyboardType="number-pad"
+                    // onChangeText={(text) => handleUpdatePartQuantity(index, text ? parseInt(text) : 0)}
+                  >
+                    {item.quantity}
+                  </Text>
+                  <Text
+                    style={tw`w-3/12 text-center`}
+                    // value={price.toFormat("")}
+                    // onChangeText={(price) => handleUpdatePartPrice(index, parseInt(price))}
+                  >
+                    {price.toFormat("$0,0.00")}
+                  </Text>
+                </View>
+              </Swipeable>
             );
           }}
           ListFooterComponent={() => {
@@ -158,7 +178,7 @@ export const Receipt = () => {
         />
       </View>
 
-      {receipt?.signature !== null ? (
+      {receipt?.signature ? (
         <View style={tw`flex flex-col items-end`}>
           <Image source={{ uri: receipt?.signature?.signature }} style={{ height: width * (281 / 738), width }} />
           <Text>Signed: {receipt?.customer?.name}</Text>

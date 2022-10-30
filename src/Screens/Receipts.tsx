@@ -1,6 +1,5 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Fuse from "fuse.js";
 import { DateTime } from "luxon";
 import { useMemo, useState } from "react";
@@ -8,6 +7,7 @@ import { Button, FlatList, Text, TextInput, TouchableOpacity, View } from "react
 import { SheetManager } from "react-native-actions-sheet";
 import tw from "twrnc";
 import { useAppState } from "../hooks/appState";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation";
 
 export const Receipts = () => {

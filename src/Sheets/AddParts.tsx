@@ -12,8 +12,10 @@ import Fuse from "fuse.js";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { TPartData, useAppState } from "../hooks/appState";
 import { BaseSheet } from "./Base";
+import { ViewHeader } from "../components/ViewHeader";
 
 export const AddParts: FC<SheetProps<TPartData[]>> = (props) => {
+  const [categoryFilter, setcategoryFilter] = useState<string | null>(null);
   const { priceSheets: priceSheets, categories } = useAppState();
   const [query, setQuery] = useState("");
   const [selected, setselected] = useState<Record<string, TPartData>>(
@@ -23,8 +25,12 @@ export const AddParts: FC<SheetProps<TPartData[]>> = (props) => {
     }, {})
   );
 
-  const priceSheet = priceSheets?.[0];
-  const items = priceSheet?.items ?? [];
+  const items = categories.flatMap((category) => {
+    if (categoryFilter !== null && category !== categoryFilter) {
+      return [];
+    }
+    return priceSheets[category]?.[0]?.items.map((item) => ({ ...item, category })) ?? [];
+  });
 
   const fuse = useMemo(
     () =>
@@ -63,34 +69,38 @@ export const AddParts: FC<SheetProps<TPartData[]>> = (props) => {
   return (
     <BaseSheet sheetId={props.sheetId}>
       <SheetProvider context="add-parts">
-        <View style={tw`flex flex-row justify-between items-center mb-4`}>
-          <Button title="Clear" onPress={() => clearSelections()} />
-
-          <TouchableOpacity
-            onPress={() =>
-              SheetManager.show<string, string>("select-category", {
-                context: "add-parts",
-                onClose: (category) => {
-                  console.log(category);
-                },
-              })
-            }
-          >
-            <Text style={tw`text-lg font-bold`}>Add {priceSheet?.category} Parts</Text>
-          </TouchableOpacity>
-
-          <Button title="Done" onPress={() => handleSave()} />
-        </View>
+        <ViewHeader
+          onCancel={() => clearSelections()}
+          cancelLabel="Reset"
+          onSubmit={() => handleSave()}
+          submitLabel="Done"
+          title="Add Parts"
+        />
 
         <TextInput
           clearButtonMode="always"
-          placeholder="Search..."
+          placeholder={`Search ${categoryFilter ?? "Everything"}...`}
           style={tw`border border-gray-400 pt-2 pb-3 px-2 rounded-lg text-lg`}
           value={query}
           onChangeText={(text) => setQuery(text)}
         />
-
-        <Text>{priceSheet.category}</Text>
+        <TouchableOpacity
+          onPress={() => {
+            SheetManager.show<string | null, string>("select-category", {
+              context: "add-parts",
+              payload: categoryFilter,
+              onClose: (category) => {
+                setcategoryFilter(category);
+              },
+            });
+          }}
+        >
+          {categoryFilter != null ? (
+            <Text style={tw`py-2 text-blue-500`}>Only showing {categoryFilter}</Text>
+          ) : (
+            <Text style={tw`py-2 text-blue-500`}>Filter by category</Text>
+          )}
+        </TouchableOpacity>
 
         <FlatList
           keyExtractor={(item) => item.id}
@@ -105,9 +115,12 @@ export const AddParts: FC<SheetProps<TPartData[]>> = (props) => {
           renderItem={({ item }) => {
             return (
               <TouchableOpacity style={tw`py-2 px-2 flex flex-row items-center`} onPress={() => handlePressItem(item)}>
-                <FontAwesome style={tw`mr-2 text-xl`} name={selected[item.id] ? "check-circle" : "circle-o"} />
+                <FontAwesome style={tw`mr-2`} name={selected[item.id] ? "check-circle" : "circle-o"} size={28} />
                 <View style={tw`flex-1 flex flex-row justify-between`}>
-                  <Text style={tw`text-lg font-semibold`}>{item.name}</Text>
+                  <View style={tw`flex flex-col`}>
+                    <Text style={tw`text-lg font-semibold`}>{item.name}</Text>
+                    <Text style={tw`text-xs text-gray-400`}>{item.category}</Text>
+                  </View>
                   <Text style={tw`text-lg text-gray-400`}>${item.price}</Text>
                 </View>
               </TouchableOpacity>

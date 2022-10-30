@@ -1,7 +1,7 @@
 import { registerSheet } from "react-native-actions-sheet";
 import { AddParts } from "./AddParts";
 import { CreateReceipt } from "./CreateReceipt";
-import { CreatePriceSheet } from "./CreatePriceSheet";
+import { CreatePriceSheetCategory } from "./CreatePriceSheetCategory";
 import { GetSignature } from "./GetSignature";
 import { PickCustomer } from "./PickCustomer";
 import { SelectCategory } from "./SelectCategory";
@@ -11,7 +11,7 @@ registerSheet("select-category", SelectCategory, "add-parts");
 registerSheet("pick-customer", PickCustomer, "create-receipt");
 registerSheet("pick-customer", PickCustomer);
 registerSheet("create-receipt", CreateReceipt);
-registerSheet("create-price-sheet", CreatePriceSheet);
+registerSheet("create-price-sheet-category", CreatePriceSheetCategory);
 registerSheet("get-signature", GetSignature);
 
 export {};

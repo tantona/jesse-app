@@ -1,21 +1,16 @@
-import { FC, useState, useRef, useMemo } from "react";
-import { View, Text, TextInput, Image, Button, ScrollView, FlatList, TouchableOpacity } from "react-native";
-import * as Contacts from "expo-contacts";
-import ActionSheet, {
-  SheetManager,
-  SheetProps,
-  useScrollHandlers,
-  ActionSheetRef,
-  SheetProvider,
-} from "react-native-actions-sheet";
-import tw from "twrnc";
-import Fuse from "fuse.js";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { TPartData, useAppState } from "../hooks/appState";
-import { Contact } from "expo-contacts";
-import { BaseSheet } from "./Base";
+import { FontAwesome5 } from "@expo/vector-icons";
 import Dinero from "dinero.js";
+import * as Contacts from "expo-contacts";
+import { Contact } from "expo-contacts";
+import { FC, useMemo, useState } from "react";
+import { Alert, FlatList, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { SheetManager, SheetProps, SheetProvider } from "react-native-actions-sheet";
+import { Swipeable } from "react-native-gesture-handler";
 import UserAvatar from "react-native-user-avatar";
+import tw from "twrnc";
+import { ViewHeader } from "../components/ViewHeader";
+import { TPartData, useAppState } from "../hooks/appState";
+import { BaseSheet } from "./Base";
 
 export const CreateReceipt: FC<SheetProps> = (props) => {
   const { createReceipt } = useAppState();
@@ -43,6 +38,10 @@ export const CreateReceipt: FC<SheetProps> = (props) => {
         parts,
       },
     });
+  };
+
+  const removePart = (index: number) => {
+    setparts(parts.filter((_, idx) => index !== idx));
   };
 
   const openPartsModal = () => {
@@ -77,11 +76,13 @@ export const CreateReceipt: FC<SheetProps> = (props) => {
   return (
     <BaseSheet sheetId={props.sheetId}>
       <SheetProvider context="create-receipt">
-        <View style={tw`flex flex-row justify-between items-center mb-4`}>
-          <Button title="Cancel" onPress={() => SheetManager.hide("create-receipt")} />
-          <Text style={tw`text-lg font-bold`}>Create Receipt</Text>
-          <Button title="Save" onPress={() => handleSave()} />
-        </View>
+        <ViewHeader
+          onCancel={() => SheetManager.hide("create-receipt")}
+          onSubmit={() => handleSave()}
+          submitLabel="Save"
+          title="Create Receipt"
+        />
+
         <TextInput
           placeholder="Receipt No."
           value={receiptNo}
@@ -138,20 +139,49 @@ export const CreateReceipt: FC<SheetProps> = (props) => {
                 renderItem={({ item, index }) => {
                   const price = Dinero({ amount: item.price * 100, currency: "USD" }).multiply(item.quantity);
                   return (
-                    <View style={tw`flex flex-row py-2`}>
-                      <Text style={tw`w-1/3`}>{item.name}</Text>
-                      <TextInput
-                        style={tw`w-1/3 text-center`}
-                        value={`${item.quantity}`}
-                        keyboardType="number-pad"
-                        onChangeText={(text) => handleUpdatePartQuantity(index, text ? parseInt(text) : 0)}
-                      />
-                      <TextInput
-                        style={tw`w-1/3 text-center`}
-                        value={price.toFormat("")}
-                        onChangeText={(price) => handleUpdatePartPrice(index, parseInt(price))}
-                      />
-                    </View>
+                    <Swipeable
+                      renderRightActions={() => {
+                        return (
+                          <TouchableOpacity
+                            onPress={() =>
+                              Alert.alert(
+                                "Remove item?",
+                                `Are you sure you would like to remove "${item.name}" from this receipt?`,
+                                [
+                                  {
+                                    text: "No",
+                                    style: "cancel",
+                                  },
+                                  {
+                                    onPress: () => removePart(index),
+                                    text: "Yes",
+                                    style: "destructive",
+                                  },
+                                ]
+                              )
+                            }
+                            style={tw`bg-red-500 flex items-center justify-center w-1/3`}
+                          >
+                            <FontAwesome5 name="trash-alt" size={16} style={tw`mr-1 text-white`} />
+                          </TouchableOpacity>
+                        );
+                      }}
+                    >
+                      <View style={tw`flex flex-row py-2 bg-white`}>
+                        <Text style={tw`w-1/3`}>{item.name}</Text>
+                        <TextInput
+                          style={tw`w-1/3 text-center`}
+                          value={`${item.quantity}`}
+                          keyboardType="number-pad"
+                          onChangeText={(text) => handleUpdatePartQuantity(index, text ? parseInt(text) : 0)}
+                        />
+                        <TextInput
+                          style={tw`w-1/3 text-center`}
+                          value={price.toFormat("")}
+                          onChangeText={(price) => handleUpdatePartPrice(index, parseInt(price))}
+                        />
+                      </View>
+                    </Swipeable>
                   );
                 }}
                 ListFooterComponent={() => {

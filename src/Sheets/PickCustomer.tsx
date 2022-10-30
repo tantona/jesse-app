@@ -1,11 +1,12 @@
 import * as Contacts from "expo-contacts";
 import Fuse from "fuse.js";
 import { FC, useEffect, useMemo, useState } from "react";
-import { FlatList, Image, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { FlatList, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SheetManager, SheetProps } from "react-native-actions-sheet";
-import tw from "twrnc";
-import { BaseSheet } from "./Base";
 import UserAvatar from "react-native-user-avatar";
+import tw from "twrnc";
+import { ViewHeader } from "../components/ViewHeader";
+import { BaseSheet } from "./Base";
 
 export const PickCustomer: FC<SheetProps> = (props) => {
   const [query, setQuery] = useState("");
@@ -32,6 +33,13 @@ export const PickCustomer: FC<SheetProps> = (props) => {
     [data]
   );
 
+  const onCancel = () => {
+    SheetManager.hide<any>(props.sheetId, {
+      payload: null,
+      context: "create-receipt",
+    });
+  };
+
   const handlePressItem = (contact: Contacts.Contact) => {
     SheetManager.hide<any>(props.sheetId, {
       payload: contact,
@@ -41,13 +49,7 @@ export const PickCustomer: FC<SheetProps> = (props) => {
 
   return (
     <BaseSheet sheetId={props.sheetId}>
-      <View style={tw`flex flex-row items-center mb-4`}>
-        <View style={tw`w-1/3 `} />
-        <View style={tw`w-1/3 flex flex-row justify-center`}>
-          <Text style={tw`text-lg font-bold`}>Pick Customer</Text>
-        </View>
-        <View style={tw`w-1/3`} />
-      </View>
+      <ViewHeader title="Pick Customer" onCancel={onCancel} />
 
       <TextInput
         clearButtonMode="always"

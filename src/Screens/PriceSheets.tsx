@@ -1,14 +1,17 @@
 import { useNavigation } from "@react-navigation/native";
 import { DateTime } from "luxon";
-import { Alert, FlatList, Text, TouchableOpacity, View } from "react-native";
+import { Alert, FlatList, Text, TouchableOpacity, View, Button } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
 import tw from "twrnc";
 import { useAppState } from "../hooks/appState";
 import { FontAwesome5 } from "@expo/vector-icons";
 
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../navigation";
+
 export const PriceSheets = () => {
-  const navigation = useNavigation<any>();
-  const { priceSheets } = useAppState();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, "PriceSheetCategory">>();
+  const { priceSheets, categories, clear } = useAppState();
 
   return (
     <View style={tw`px-2 flex flex-col flex-1`}>
@@ -18,25 +21,31 @@ export const PriceSheets = () => {
         </TouchableOpacity>
       </View>
 
+      {/* <Button onPress={clear} title="Clear">
+        Clear
+      </Button> */}
+
       <View>
-        <Text style={tw`font-bold text-xl mb-2`}>Price Sheets</Text>
+        <Text style={tw`font-bold text-xl mb-2`}>Price Sheet Categories</Text>
       </View>
       <FlatList
         style={tw`flex-1`}
-        data={priceSheets ?? []}
+        data={Array.from(categories) ?? []}
         renderItem={({ item, index }) => {
           return (
-            <View style={tw`mx-2 py-2 flex flex-row items-center`}>
+            <TouchableOpacity
+              style={tw`px-2 py-4 flex flex-row items-center border-b border-b-gray-200`}
+              onPress={() => {
+                navigation.navigate("PriceSheetCategory", { category: item });
+              }}
+            >
               <View style={tw`flex-1`}>
-                <Text style={tw`text-lg font-bold`}>#{index + 1}</Text>
-                <Text>Created {DateTime.fromISO(item.created).toLocaleString()}</Text>
+                <Text style={tw`text-lg`}>{item}</Text>
               </View>
               <View>
-                <View style={tw`bg-blue-800 py-1 px-2 rounded rounded-full`}>
-                  <Text style={tw`text-xs text-white`}>{item.category}</Text>
-                </View>
+                <FontAwesome5 name="chevron-right" />
               </View>
-            </View>
+            </TouchableOpacity>
           );
         }}
       />
@@ -45,11 +54,11 @@ export const PriceSheets = () => {
         <TouchableOpacity
           style={tw`flex flex-row items-center py-1 px-2`}
           onPress={() => {
-            SheetManager.show("create-price-sheet");
+            SheetManager.show("create-price-sheet-category");
           }}
         >
           <FontAwesome5 name="plus-circle" size={16} style={tw`mr-1 text-blue-600`} />
-          <Text style={tw`font-bold text-blue-600`}>Add Price Sheet</Text>
+          <Text style={tw`font-bold text-blue-600`}>Add Category</Text>
         </TouchableOpacity>
       </View>
     </View>

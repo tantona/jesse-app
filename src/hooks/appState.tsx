@@ -8,7 +8,7 @@ import { v4 } from "uuid";
 
 interface IState {
   receipts: TReceipt[];
-  priceSheets: TPriceSheet[];
+  priceSheets: Record<string, TPriceSheet[]>;
 }
 
 export type TSignature = {
@@ -17,7 +17,7 @@ export type TSignature = {
 };
 
 const ctx = createContext<{ state: IState; dispatch: React.Dispatch<TDispatcherAction> }>({
-  state: { receipts: [], priceSheets: [] },
+  state: { receipts: [], priceSheets: {} },
   dispatch: () => {},
 });
 
@@ -47,7 +47,7 @@ type TDataLoaded = {
   type: "data-loaded";
   data: {
     receipts: TReceipt[];
-    priceSheets: TPriceSheet[];
+    priceSheets: Record<string, TPriceSheet[]>;
   };
 };
 
@@ -56,6 +56,7 @@ export type TPriceSheet = {
   category: string;
   created: string;
   items: TPartData[];
+  fileName: string;
 };
 
 type TClearData = {
@@ -70,7 +71,30 @@ type TSaveSignature = {
   };
 };
 
-type TDispatcherAction = TAddRecieipt | TAddPriceSheet | TDataLoaded | TCreateReceipt | TSaveSignature | TClearData;
+type TRemovePriceSheet = {
+  type: "remove-pricesheet";
+  data: {
+    category: string;
+    index: number;
+  };
+};
+
+type TCreatePriceSheetCategory = {
+  type: "create-pricesheet-category";
+  data: {
+    category: string;
+  };
+};
+
+type TDispatcherAction =
+  | TAddRecieipt
+  | TAddPriceSheet
+  | TDataLoaded
+  | TCreateReceipt
+  | TSaveSignature
+  | TClearData
+  | TRemovePriceSheet
+  | TCreatePriceSheetCategory;
 
 export type TReceipt = {
   id: string;
@@ -83,7 +107,7 @@ export type TReceipt = {
 
 const INITIAL_STATE: IState = {
   receipts: [],
-  priceSheets: [],
+  priceSheets: {},
 };
 
 export const KEY_FORMAT = "yyyy-dd-MM";
@@ -91,8 +115,17 @@ export const AppStateProvider: FC<PropsWithChildren> = ({ children }) => {
   const { setItem, getItem } = useAsyncStorage("@data");
   const [state, dispatch] = useImmerReducer<IState, TDispatcherAction>((state, action) => {
     switch (action.type) {
+      case "create-pricesheet-category":
+        state.priceSheets[action.data.category] = [];
+        return state;
       case "create-priceSheet":
-        state.priceSheets.push(action.data);
+        state.priceSheets[action.data.category].push(action.data);
+        return state;
+
+      case "remove-pricesheet":
+        state.priceSheets[action.data.category] = state.priceSheets[action.data.category].filter(
+          (_, index) => index !== action.data.index
+        );
         return state;
 
       case "data-loaded":
@@ -172,14 +205,24 @@ export const useAppState = () => {
     dispatch({ type: "clear-data" });
   };
 
+  const removePricesheet = (category: string, index: number) => {
+    dispatch({ type: "remove-pricesheet", data: { category, index } });
+  };
+
+  const createPriceSheetCategory = (category: string) => {
+    dispatch({ type: "create-pricesheet-category", data: { category } });
+  };
+
   const categories = useMemo(() => {
-    return new Set(state.priceSheets.map((p) => p.category));
+    return Object.keys(state.priceSheets);
   }, [state.priceSheets]);
 
   return {
     ...state,
     categories,
+    createPriceSheetCategory,
     createPriceSheet,
+    removePricesheet,
     createReceipt,
     saveSignature,
     clear,
