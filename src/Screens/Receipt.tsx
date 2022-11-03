@@ -81,7 +81,6 @@ export const Receipt = () => {
         title: fileName,
         url: `file://${file.filePath}`,
       });
-      console.log(resp.action);
     } catch (err) {
       console.log(err);
     }
@@ -180,7 +179,10 @@ export const Receipt = () => {
 
       {receipt?.signature ? (
         <View style={tw`flex flex-col items-end`}>
-          <Image source={{ uri: receipt?.signature?.signature }} style={{ height: width * (281 / 738), width }} />
+          <Image
+            source={{ uri: receipt?.signature?.signature }}
+            style={{ height: width * (281 / 738), width, transform: [{ rotate: "180deg" }] }}
+          />
           <Text>Signed: {receipt?.customer?.name}</Text>
           <Text>Date: {DateTime.fromISO(receipt?.signature?.date).toLocaleString()}</Text>
         </View>

@@ -31,6 +31,13 @@ export const PriceSheets = () => {
       <FlatList
         style={tw`flex-1`}
         data={Array.from(categories) ?? []}
+        ListEmptyComponent={() => {
+          return (
+            <View style={tw`flex flex-row items-center justify-center mt-16`}>
+              <Text style={tw`text-gray-400`}>No categories yet</Text>
+            </View>
+          );
+        }}
         renderItem={({ item, index }) => {
           return (
             <TouchableOpacity

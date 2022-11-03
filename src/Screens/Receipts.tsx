@@ -43,6 +43,13 @@ export const Receipts = () => {
       <FlatList
         style={tw`flex-1`}
         data={query === "" ? receipts : fuse.search(query).map((item) => item.item)}
+        ListEmptyComponent={() => {
+          return (
+            <View style={tw`flex flex-row items-center justify-center mt-16`}>
+              <Text style={tw`text-gray-400`}>No receipts yet</Text>
+            </View>
+          );
+        }}
         renderItem={({ item }) => {
           return (
             <TouchableOpacity

@@ -68,14 +68,20 @@ export const GetSignature: FC<SheetProps> = ({ sheetId }) => {
           >
             <TouchableOpacity
               onPress={() => handleConfirm()}
-              style={{ position: "absolute", top: 50, transform: [{ rotate: "-90deg" }] }}
+              style={{ ...tw`px-3 py-2`, position: "absolute", top: 50, transform: [{ rotate: "-90deg" }] }}
             >
               <Text style={tw`text-lg text-blue-500`}>Accept</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={() => handleCancel()}
-              style={{ position: "absolute", bottom: 50, transform: [{ rotate: "-90deg" }] }}
+              style={{
+                ...tw`px-3 py-2`,
+
+                position: "absolute",
+                bottom: 50,
+                transform: [{ rotate: "-90deg" }],
+              }}
             >
               <Text style={tw`text-lg text-blue-500`}>Cancel</Text>
             </TouchableOpacity>

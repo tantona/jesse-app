@@ -48,7 +48,7 @@ export const PickCustomer: FC<SheetProps> = (props) => {
   };
 
   return (
-    <BaseSheet sheetId={props.sheetId}>
+    <BaseSheet id={props.sheetId} headerAlwaysVisible isModal>
       <ViewHeader title="Pick Customer" onCancel={onCancel} />
 
       <TextInput

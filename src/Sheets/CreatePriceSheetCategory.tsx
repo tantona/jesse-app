@@ -22,7 +22,7 @@ export const CreatePriceSheetCategory: FC<SheetProps> = (props) => {
 
   return (
     <ActionSheet id={props.sheetId} headerAlwaysVisible isModal>
-      <View style={tw`p-2`}>
+      <View style={tw`p-2 pb-4`}>
         <ViewHeader
           onCancel={() => SheetManager.hide("create-price-sheet-category")}
           onSubmit={handleSubmit}

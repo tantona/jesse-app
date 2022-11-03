@@ -11,6 +11,7 @@ import tw from "twrnc";
 import { ViewHeader } from "../components/ViewHeader";
 import { TPartData, useAppState } from "../hooks/appState";
 import { BaseSheet } from "./Base";
+import { FakeCurrencyInput } from "react-native-currency-input";
 
 export const CreateReceipt: FC<SheetProps> = (props) => {
   const { createReceipt } = useAppState();
@@ -58,7 +59,8 @@ export const CreateReceipt: FC<SheetProps> = (props) => {
 
   const total = useMemo(() => {
     return parts?.reduce((acc, part) => {
-      const price = Dinero({ amount: part.price * 100, currency: "USD" }).multiply(part.quantity);
+      const p = part?.price ?? 0;
+      const price = Dinero({ amount: Math.floor(p * 100), currency: "USD" }).multiply(part.quantity);
       return acc.add(price);
     }, Dinero({ amount: 0, currency: "USD" }));
   }, [parts]);
@@ -74,7 +76,7 @@ export const CreateReceipt: FC<SheetProps> = (props) => {
   };
 
   return (
-    <BaseSheet sheetId={props.sheetId}>
+    <BaseSheet id={props.sheetId}>
       <SheetProvider context="create-receipt">
         <ViewHeader
           onCancel={() => SheetManager.hide("create-receipt")}
@@ -137,7 +139,6 @@ export const CreateReceipt: FC<SheetProps> = (props) => {
                   );
                 }}
                 renderItem={({ item, index }) => {
-                  const price = Dinero({ amount: item.price * 100, currency: "USD" }).multiply(item.quantity);
                   return (
                     <Swipeable
                       renderRightActions={() => {
@@ -175,14 +176,28 @@ export const CreateReceipt: FC<SheetProps> = (props) => {
                           keyboardType="number-pad"
                           onChangeText={(text) => handleUpdatePartQuantity(index, text ? parseInt(text) : 0)}
                         />
-                        <TextInput
-                          style={tw`w-1/3 text-center`}
-                          value={price.toFormat("")}
-                          onChangeText={(price) => handleUpdatePartPrice(index, parseInt(price))}
-                        />
+
+                        <View style={tw`w-1/3 flex justify-center`}>
+                          <FakeCurrencyInput
+                            placeholder="$0.00"
+                            style={tw`text-center text-sm`}
+                            prefix="$"
+                            separator="."
+                            precision={2}
+                            value={item.price}
+                            minValue={0}
+                            onBlur={(e) => {
+                              if (!item.price) {
+                                handleUpdatePartPrice(index, 0.0);
+                              }
+                            }}
+                            onChangeValue={(value) => handleUpdatePartPrice(index, value)}
+                          />
+                        </View>
                       </View>
                     </Swipeable>
                   );
+                  0;
                 }}
                 ListFooterComponent={() => {
                   return (

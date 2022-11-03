@@ -67,7 +67,7 @@ export const AddParts: FC<SheetProps<TPartData[]>> = (props) => {
   };
 
   return (
-    <BaseSheet sheetId={props.sheetId}>
+    <BaseSheet id={props.sheetId}>
       <SheetProvider context="add-parts">
         <ViewHeader
           onCancel={() => clearSelections()}
@@ -110,7 +110,8 @@ export const AddParts: FC<SheetProps<TPartData[]>> = (props) => {
                   .search(query)
                   .filter((item) => item.item.price !== -1)
                   .map((item) => item.item)
-              : items.filter((item) => item.price !== -1)
+                  .slice(0, 100)
+              : items.slice(0, 100).filter((item) => item.price !== -1)
           }
           renderItem={({ item }) => {
             return (

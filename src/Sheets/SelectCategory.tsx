@@ -12,7 +12,6 @@ export const SelectCategory: FC<SheetProps<string | null>> = (props) => {
   const [category, setcategory] = useState(props?.payload ?? null);
 
   const handleDone = () => {
-    console.log(category);
     SheetManager.hide<string | null>("select-category", {
       context: "add-parts",
       payload: category,

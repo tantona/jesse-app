@@ -119,7 +119,7 @@ export const AppStateProvider: FC<PropsWithChildren> = ({ children }) => {
         state.priceSheets[action.data.category] = [];
         return state;
       case "create-priceSheet":
-        state.priceSheets[action.data.category].push(action.data);
+        state.priceSheets[action.data.category].unshift(action.data);
         return state;
 
       case "remove-pricesheet":
