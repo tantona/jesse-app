@@ -1,5 +1,5 @@
 import { FC, useRef } from "react";
-import { Dimensions, Text, TouchableOpacity, View } from "react-native";
+import { Dimensions, SafeAreaView, Text, TouchableOpacity, View } from "react-native";
 import ActionSheet, { SheetManager, SheetProps } from "react-native-actions-sheet";
 import SignatureScreen, { SignatureViewRef } from "react-native-signature-canvas";
 import tw from "twrnc";
@@ -10,13 +10,16 @@ export const GetSignature: FC<SheetProps> = ({ sheetId }) => {
   const ref = useRef<SignatureViewRef>();
 
   const handleCancel = () => {
-    SheetManager.hide("get-signature");
+    SheetManager.hide("get-signature", {
+      context: "create-receipt",
+    });
   };
   const handleOK = (signature: string) => {
     const date = new Date();
     SheetManager.hide<TSignature>("get-signature", {
+      context: "create-receipt",
       payload: {
-        signature,
+        uri: signature,
         date: date.toISOString(),
       },
     });
@@ -32,7 +35,7 @@ export const GetSignature: FC<SheetProps> = ({ sheetId }) => {
 
   return (
     <ActionSheet id={sheetId} isModal>
-      <View>
+      <SafeAreaView>
         <View style={{ ...tw`p-4 flex flex-row`, height: height }}>
           <View
             style={{
@@ -87,7 +90,7 @@ export const GetSignature: FC<SheetProps> = ({ sheetId }) => {
             </TouchableOpacity>
           </View>
         </View>
-      </View>
+      </SafeAreaView>
     </ActionSheet>
   );
 };

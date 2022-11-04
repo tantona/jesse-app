@@ -49,33 +49,35 @@ export const PickCustomer: FC<SheetProps> = (props) => {
 
   return (
     <BaseSheet id={props.sheetId} headerAlwaysVisible isModal>
-      <ViewHeader title="Pick Customer" onCancel={onCancel} />
+      <View style={tw`p-2`}>
+        <ViewHeader title="Pick Customer" onCancel={onCancel} />
 
-      <TextInput
-        clearButtonMode="always"
-        placeholder="Search..."
-        style={tw`border border-gray-400 pt-2 pb-3 px-2 rounded-lg text-lg`}
-        value={query}
-        onChangeText={(text) => setQuery(text)}
-      />
+        <TextInput
+          clearButtonMode="always"
+          placeholder="Search..."
+          style={tw`border border-gray-400 pt-2 pb-3 px-2 rounded-lg text-lg`}
+          value={query}
+          onChangeText={(text) => setQuery(text)}
+        />
 
-      <FlatList
-        data={query !== "" ? fuse.search(query).map((item) => item.item) : data}
-        renderItem={({ item }) => {
-          return (
-            <TouchableOpacity style={tw`py-2 px-2 flex flex-row items-center`} onPress={() => handlePressItem(item)}>
-              <UserAvatar size={50} name={item.name} src={item.image?.uri} style={tw`mr-4`} />
+        <FlatList
+          data={query !== "" ? fuse.search(query).map((item) => item.item) : data}
+          renderItem={({ item }) => {
+            return (
+              <TouchableOpacity style={tw`py-2 px-2 flex flex-row items-center`} onPress={() => handlePressItem(item)}>
+                <UserAvatar size={50} name={item.name} src={item.image?.uri} style={tw`mr-4`} />
 
-              <Text style={tw`text-lg font-semibold`}>{item.name}</Text>
-            </TouchableOpacity>
-          );
-        }}
-        ListEmptyComponent={() => (
-          <View style={tw`py-4 px-2`}>
-            <Text style={tw`text-lg font-semibold text-center text-gray-400`}>No parts found</Text>
-          </View>
-        )}
-      />
+                <Text style={tw`text-lg font-semibold`}>{item.name}</Text>
+              </TouchableOpacity>
+            );
+          }}
+          ListEmptyComponent={() => (
+            <View style={tw`py-4 px-2`}>
+              <Text style={tw`text-lg font-semibold text-center text-gray-400`}>No parts found</Text>
+            </View>
+          )}
+        />
+      </View>
     </BaseSheet>
   );
 };

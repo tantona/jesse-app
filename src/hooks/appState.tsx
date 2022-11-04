@@ -12,7 +12,7 @@ interface IState {
 }
 
 export type TSignature = {
-  signature: string;
+  uri: string;
   date: string;
 };
 

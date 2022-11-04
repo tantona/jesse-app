@@ -12,6 +12,6 @@ registerSheet("pick-customer", PickCustomer, "create-receipt");
 registerSheet("pick-customer", PickCustomer);
 registerSheet("create-receipt", CreateReceipt);
 registerSheet("create-price-sheet-category", CreatePriceSheetCategory);
-registerSheet("get-signature", GetSignature);
+registerSheet("get-signature", GetSignature, "create-receipt");
 
 export {};

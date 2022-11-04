@@ -4,7 +4,7 @@ import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { readRemoteFile } from "react-native-csv";
 import { v4 } from "uuid";
 import { DateTime } from "luxon";
-import { Alert, FlatList, Text, TouchableOpacity, View } from "react-native";
+import { Alert, FlatList, SafeAreaView, Text, TouchableOpacity, View } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
 import tw from "twrnc";
 import { TPartData, useAppState } from "../hooks/appState";
@@ -78,71 +78,73 @@ export const PriceSheetCategory = () => {
   }, [category]);
 
   return (
-    <View style={tw`px-2 flex flex-col flex-1`}>
-      <BackButton />
+    <SafeAreaView style={tw`flex-1`}>
+      <View style={tw`px-2 flex flex-col flex-1`}>
+        <BackButton />
 
-      <View style={tw`flex flex-row justify-end py-3`}>
-        <TouchableOpacity onPress={() => navigation.navigate("Receipts")}>
-          <Text style={tw`font-bold text-blue-500`}>Receipts</Text>
-        </TouchableOpacity>
-      </View>
+        <View style={tw`flex flex-row justify-end py-3`}>
+          <TouchableOpacity onPress={() => navigation.navigate("Receipts")}>
+            <Text style={tw`font-bold text-blue-500`}>Receipts</Text>
+          </TouchableOpacity>
+        </View>
 
-      <View>
-        <Text style={tw`font-bold text-gray-600`}>{category}</Text>
-        <Text style={tw`font-bold text-xl mb-2`}>Price Sheets</Text>
-      </View>
-      <FlatList
-        style={tw`flex-1`}
-        data={priceSheets?.[category] ?? []}
-        ListEmptyComponent={() => {
-          return (
-            <View style={tw`flex flex-row items-center justify-center mt-16`}>
-              <Text style={tw`text-gray-400`}>No price sheets in this category</Text>
-            </View>
-          );
-        }}
-        renderItem={({ item, index }) => {
-          return (
-            <Swipeable
-              renderRightActions={() => {
-                return (
-                  <TouchableOpacity
-                    onPress={() => {
-                      Alert.alert("Remove price sheet", "Are you sure you want to remove this price sheet?", [
-                        { text: "Cancel", style: "cancel" },
-                        { text: "Delete", style: "destructive", onPress: () => removePricesheet(category, index) },
-                      ]);
-                    }}
-                    style={tw`bg-red-500 flex items-center justify-center w-1/3`}
-                  >
-                    <FontAwesome5 name="trash-alt" size={16} style={tw`mr-1 text-white`} />
-                  </TouchableOpacity>
-                );
-              }}
-            >
-              <View style={tw`mx-2 py-2 flex flex-row items-center bg-white`}>
-                <View style={tw`flex-1`}>
-                  <Text style={tw`text-lg font-bold`}>#{index + 1}</Text>
-                  <Text>Added {DateTime.fromISO(item.created).toLocaleString()}</Text>
-                  <Text>{item?.fileName ?? "No filename"}</Text>
-                </View>
+        <View>
+          <Text style={tw`font-bold text-gray-600`}>{category}</Text>
+          <Text style={tw`font-bold text-xl mb-2`}>Price Sheets</Text>
+        </View>
+        <FlatList
+          style={tw`flex-1`}
+          data={priceSheets?.[category] ?? []}
+          ListEmptyComponent={() => {
+            return (
+              <View style={tw`flex flex-row items-center justify-center mt-16`}>
+                <Text style={tw`text-gray-400`}>No price sheets in this category</Text>
               </View>
-            </Swipeable>
-          );
-        }}
-      />
-
-      <View>
-        <TouchableOpacity
-          style={tw`flex flex-row items-center py-1 px-2`}
-          onPress={() => {
-            handlePickFile();
+            );
           }}
-        >
-          <FontAwesome5 name="plus-circle" size={16} style={tw`mr-1 text-blue-600`} />
-          <Text style={tw`font-bold text-blue-600`}>Add Price Sheet</Text>
-        </TouchableOpacity>
+          renderItem={({ item, index }) => {
+            return (
+              <Swipeable
+                renderRightActions={() => {
+                  return (
+                    <TouchableOpacity
+                      onPress={() => {
+                        Alert.alert("Remove price sheet", "Are you sure you want to remove this price sheet?", [
+                          { text: "Cancel", style: "cancel" },
+                          { text: "Delete", style: "destructive", onPress: () => removePricesheet(category, index) },
+                        ]);
+                      }}
+                      style={tw`bg-red-500 flex items-center justify-center w-1/3`}
+                    >
+                      <FontAwesome5 name="trash-alt" size={16} style={tw`mr-1 text-white`} />
+                    </TouchableOpacity>
+                  );
+                }}
+              >
+                <View style={tw`mx-2 py-2 flex flex-row items-center bg-white`}>
+                  <View style={tw`flex-1`}>
+                    <Text style={tw`text-lg font-bold`}>#{index + 1}</Text>
+                    <Text>Added {DateTime.fromISO(item.created).toLocaleString()}</Text>
+                    <Text>{item?.fileName ?? "No filename"}</Text>
+                  </View>
+                </View>
+              </Swipeable>
+            );
+          }}
+        />
+
+        <View>
+          <TouchableOpacity
+            style={tw`flex flex-row items-center py-1 px-2`}
+            onPress={() => {
+              handlePickFile();
+            }}
+          >
+            <FontAwesome5 name="plus-circle" size={16} style={tw`mr-1 text-blue-600`} />
+            <Text style={tw`font-bold text-blue-600`}>Add Price Sheet</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };

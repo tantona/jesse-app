@@ -69,72 +69,77 @@ export const AddParts: FC<SheetProps<TPartData[]>> = (props) => {
   return (
     <BaseSheet id={props.sheetId}>
       <SheetProvider context="add-parts">
-        <ViewHeader
-          onCancel={() => clearSelections()}
-          cancelLabel="Reset"
-          onSubmit={() => handleSave()}
-          submitLabel="Done"
-          title="Add Parts"
-        />
+        <View style={tw`p-2`}>
+          <ViewHeader
+            onCancel={() => clearSelections()}
+            cancelLabel="Reset"
+            onSubmit={() => handleSave()}
+            submitLabel="Done"
+            title="Add Parts"
+          />
 
-        <TextInput
-          clearButtonMode="always"
-          placeholder={`Search ${categoryFilter ?? "Everything"}...`}
-          style={tw`border border-gray-400 pt-2 pb-3 px-2 rounded-lg text-lg`}
-          value={query}
-          onChangeText={(text) => setQuery(text)}
-        />
-        <TouchableOpacity
-          onPress={() => {
-            SheetManager.show<string | null, string>("select-category", {
-              context: "add-parts",
-              payload: categoryFilter,
-              onClose: (category) => {
-                setcategoryFilter(category);
-              },
-            });
-          }}
-        >
-          {categoryFilter != null ? (
-            <Text style={tw`py-2 text-blue-500`}>Only showing {categoryFilter}</Text>
-          ) : (
-            <Text style={tw`py-2 text-blue-500`}>Filter by category</Text>
-          )}
-        </TouchableOpacity>
+          <TextInput
+            clearButtonMode="always"
+            placeholder={`Search ${categoryFilter ?? "Everything"}...`}
+            style={tw`border border-gray-400 pt-2 pb-3 px-2 rounded-lg text-lg`}
+            value={query}
+            onChangeText={(text) => setQuery(text)}
+          />
+          <TouchableOpacity
+            onPress={() => {
+              SheetManager.show<string | null, string>("select-category", {
+                context: "add-parts",
+                payload: categoryFilter,
+                onClose: (category) => {
+                  setcategoryFilter(category);
+                },
+              });
+            }}
+          >
+            {categoryFilter != null ? (
+              <Text style={tw`py-2 text-blue-500`}>Only showing {categoryFilter}</Text>
+            ) : (
+              <Text style={tw`py-2 text-blue-500`}>Filter by category</Text>
+            )}
+          </TouchableOpacity>
 
-        <FlatList
-          keyExtractor={(item) => item.id}
-          data={
-            query !== ""
-              ? fuse
-                  .search(query)
-                  .filter((item) => item.item.price !== -1)
-                  .map((item) => item.item)
-                  .slice(0, 100)
-              : items.slice(0, 100).filter((item) => item.price !== -1)
-          }
-          renderItem={({ item }) => {
-            return (
-              <TouchableOpacity style={tw`py-2 px-2 flex flex-row items-center`} onPress={() => handlePressItem(item)}>
-                <FontAwesome style={tw`mr-2`} name={selected[item.id] ? "check-circle" : "circle-o"} size={28} />
-                <View style={tw`flex-1 flex flex-row justify-between`}>
-                  <View style={tw`flex flex-col`}>
-                    <Text style={tw`text-lg font-semibold`}>{item.name}</Text>
-                    <Text style={tw`text-xs text-gray-400`}>{item.category}</Text>
+          <FlatList
+            keyExtractor={(item) => item.id}
+            data={
+              query !== ""
+                ? fuse
+                    .search(query)
+                    .filter((item) => item.item.price !== -1)
+                    .map((item) => item.item)
+                    .slice(0, 100)
+                : items.slice(0, 100).filter((item) => item.price !== -1)
+            }
+            renderItem={({ item }) => {
+              return (
+                <TouchableOpacity
+                  style={tw`py-2 px-2 flex flex-row items-center`}
+                  onPress={() => handlePressItem(item)}
+                >
+                  <FontAwesome style={tw`mr-2`} name={selected[item.id] ? "check-circle" : "circle-o"} size={28} />
+                  <View style={tw`flex-1 flex flex-row justify-between`}>
+                    <View style={tw`flex flex-col`}>
+                      <Text style={tw`text-lg font-semibold`}>{item.name}</Text>
+                      <Text style={tw`text-xs text-gray-400`}>{item.category}</Text>
+                    </View>
+                    <Text style={tw`text-lg text-gray-400`}>${item.price}</Text>
                   </View>
-                  <Text style={tw`text-lg text-gray-400`}>${item.price}</Text>
-                </View>
-              </TouchableOpacity>
-            );
-          }}
-          ListEmptyComponent={() => (
-            <View style={tw`py-4 px-2`}>
-              <Text style={tw`text-lg font-semibold text-center text-gray-400`}>No parts found</Text>
-            </View>
-          )}
-        />
-        <View style={tw`flex flex-row justify-center mb-4`}>
-          <Text style={tw`font-semibold`}>{Object.keys(selected).length} selected</Text>
+                </TouchableOpacity>
+              );
+            }}
+            ListEmptyComponent={() => (
+              <View style={tw`py-4 px-2`}>
+                <Text style={tw`text-lg font-semibold text-center text-gray-400`}>No parts found</Text>
+              </View>
+            )}
+          />
+          <View style={tw`flex flex-row justify-center mb-4`}>
+            <Text style={tw`font-semibold`}>{Object.keys(selected).length} selected</Text>
+          </View>
         </View>
       </SheetProvider>
     </BaseSheet>

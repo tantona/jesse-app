@@ -5,8 +5,9 @@ export type IPriceSheetCategory = {
 };
 
 export type RootStackParamList = {
+  Intro: {};
   PriceSheets: {};
   PriceSheetCategory: IPriceSheetCategory;
   Receipts: {};
-  Receipt: TReceipt;
+  // Receipt: TReceipt;
 };
