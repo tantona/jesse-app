@@ -16,8 +16,8 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
                BuildableName = "jesseappnative.app"
-               BlueprintName = "jesseappnative"
-               ReferencedContainer = "container:jesseappnative.xcodeproj">
+               BlueprintName = "jesseapp"
+               ReferencedContainer = "container:jesseapp.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -35,7 +35,7 @@
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
                BuildableName = "jesseappnativeTests.xctest"
                BlueprintName = "jesseappnativeTests"
-               ReferencedContainer = "container:jesseappnative.xcodeproj">
+               ReferencedContainer = "container:jesseapp.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -56,8 +56,8 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
             BuildableName = "jesseappnative.app"
-            BlueprintName = "jesseappnative"
-            ReferencedContainer = "container:jesseappnative.xcodeproj">
+            BlueprintName = "jesseapp"
+            ReferencedContainer = "container:jesseapp.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -73,8 +73,8 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
             BuildableName = "jesseappnative.app"
-            BlueprintName = "jesseappnative"
-            ReferencedContainer = "container:jesseappnative.xcodeproj">
+            BlueprintName = "jesseapp"
+            ReferencedContainer = "container:jesseapp.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
