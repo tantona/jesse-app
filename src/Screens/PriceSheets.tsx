@@ -30,9 +30,13 @@ export const PriceSheets = () => {
           data={Array.from(categories) ?? []}
           ListEmptyComponent={() => {
             return (
-              <View style={tw`flex flex-row items-center justify-center mt-16`}>
-                <Text style={tw`text-gray-400`}>No categories yet</Text>
-              </View>
+              <TouchableOpacity
+                onPress={() => SheetManager.show("create-price-sheet-category")}
+                style={tw`flex flex-row justify-center items-center my-16`}
+              >
+                <Text style={tw`text-gray-400`}>Tap here to add a category</Text>
+                <FontAwesome5 name="plus-circle" size={12} style={tw`mx-1 text-blue-600`} />
+              </TouchableOpacity>
             );
           }}
           renderItem={({ item, index }) => {
@@ -54,9 +58,9 @@ export const PriceSheets = () => {
           }}
         />
 
-        <View>
+        <View style={tw`flex flex-row`}>
           <TouchableOpacity
-            style={tw`flex flex-row items-center py-1 px-2`}
+            style={tw`flex flex-row items-center py-3 px-2`}
             onPress={() => {
               SheetManager.show("create-price-sheet-category");
             }}

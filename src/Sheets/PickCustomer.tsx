@@ -55,7 +55,7 @@ export const PickCustomer: FC<SheetProps> = (props) => {
         <TextInput
           clearButtonMode="always"
           placeholder="Search..."
-          style={tw`border border-gray-400 pt-2 pb-3 px-2 rounded-lg text-lg`}
+          style={{ ...tw`border border-gray-400 pt-2 pb-3 px-2 rounded-lg`, fontSize: 20 }}
           value={query}
           onChangeText={(text) => setQuery(text)}
         />

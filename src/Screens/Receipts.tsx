@@ -35,7 +35,7 @@ export const Receipts = () => {
           <TextInput
             clearButtonMode="always"
             placeholder="Search..."
-            style={tw`border border-gray-400 pt-2 pb-3 px-2 rounded-lg text-lg`}
+            style={{ ...tw`border border-gray-400 pt-2 pb-3 px-2 rounded-lg`, fontSize: 20 }}
             value={query}
             onChangeText={(text) => setquery(text)}
           />
@@ -46,9 +46,13 @@ export const Receipts = () => {
           data={query === "" ? receipts : fuse.search(query).map((item) => item.item)}
           ListEmptyComponent={() => {
             return (
-              <View style={tw`flex flex-row items-center justify-center mt-16`}>
-                <Text style={tw`text-gray-400`}>No receipts yet</Text>
-              </View>
+              <TouchableOpacity
+                onPress={() => SheetManager.show("create-receipt")}
+                style={tw`flex flex-row justify-center items-center my-16`}
+              >
+                <Text style={tw`text-gray-400`}>Tap here to create a receipt</Text>
+                <FontAwesome5 name="plus-circle" size={12} style={tw`mx-1 text-blue-600`} />
+              </TouchableOpacity>
             );
           }}
           renderItem={({ item }) => {
@@ -75,9 +79,9 @@ export const Receipts = () => {
           }}
         />
 
-        <View>
+        <View style={tw`flex flex-row`}>
           <TouchableOpacity
-            style={tw`flex flex-row items-center py-1 px-2`}
+            style={tw`flex flex-row items-center py-3 px-2`}
             onPress={() => {
               SheetManager.show("create-receipt");
             }}

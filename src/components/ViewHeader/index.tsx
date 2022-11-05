@@ -13,7 +13,7 @@ export const ViewHeader: FC<{
     <View style={tw`flex flex-row items-center mb-3`}>
       <View style={tw`w-3/12`}>
         {onCancel && (
-          <TouchableOpacity onPress={() => onCancel()}>
+          <TouchableOpacity onPress={() => onCancel()} style={tw`py-2`}>
             <Text style={tw`text-lg text-gray-500`}>{cancelLabel ?? "Cancel"}</Text>
           </TouchableOpacity>
         )}
@@ -24,7 +24,7 @@ export const ViewHeader: FC<{
       <View style={tw`w-3/12 flex flex-row justify-end`}>
         {onSubmit && (
           <TouchableOpacity>
-            <Text style={tw`text-lg text-blue-500`} onPress={() => onSubmit()}>
+            <Text style={tw`text-lg text-blue-500 py-2`} onPress={() => onSubmit()}>
               {submitLabel ?? "Submit"}
             </Text>
           </TouchableOpacity>

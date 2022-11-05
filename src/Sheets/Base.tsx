@@ -8,7 +8,7 @@ const { height } = Dimensions.get("window");
 export const BaseSheet: FC<PropsWithChildren<ActionSheetProps>> = ({ id, children, ...rest }) => {
   return (
     <ActionSheet id={id} headerAlwaysVisible isModal {...rest}>
-      <View style={{ ...tw`flex flex-col`, height: height * 0.92 }}>{children}</View>
+      <View style={{ ...tw`flex flex-col`, height: height * 0.93 }}>{children}</View>
     </ActionSheet>
   );
 };

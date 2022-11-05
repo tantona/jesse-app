@@ -97,9 +97,13 @@ export const PriceSheetCategory = () => {
           data={priceSheets?.[category] ?? []}
           ListEmptyComponent={() => {
             return (
-              <View style={tw`flex flex-row items-center justify-center mt-16`}>
-                <Text style={tw`text-gray-400`}>No price sheets in this category</Text>
-              </View>
+              <TouchableOpacity
+                onPress={() => handlePickFile()}
+                style={tw`flex flex-row justify-center items-center my-16`}
+              >
+                <Text style={tw`text-gray-400`}>Tap here to add a price sheet</Text>
+                <FontAwesome5 name="plus-circle" size={12} style={tw`mx-1 text-blue-600`} />
+              </TouchableOpacity>
             );
           }}
           renderItem={({ item, index }) => {
@@ -133,9 +137,9 @@ export const PriceSheetCategory = () => {
           }}
         />
 
-        <View>
+        <View style={tw`flex flex-row`}>
           <TouchableOpacity
-            style={tw`flex flex-row items-center py-1 px-2`}
+            style={tw`flex flex-row items-center py-3 px-2`}
             onPress={() => {
               handlePickFile();
             }}

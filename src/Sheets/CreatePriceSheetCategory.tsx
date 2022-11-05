@@ -26,13 +26,13 @@ export const CreatePriceSheetCategory: FC<SheetProps> = (props) => {
         <ViewHeader
           onCancel={() => SheetManager.hide("create-price-sheet-category")}
           onSubmit={handleSubmit}
-          submitLabel="Next"
+          submitLabel="Create"
           title="Create new category"
         />
 
         <TextInput
           clearButtonMode="always"
-          style={tw`border border-gray-400 pt-2 pb-3 px-2 rounded-lg text-lg`}
+          style={{ ...tw`border border-gray-400 pt-2 pb-3 px-2 rounded-lg`, fontSize: 20 }}
           value={category}
           onChangeText={setcategory}
           placeholder="Category Name"

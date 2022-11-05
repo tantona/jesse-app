@@ -160,9 +160,7 @@ export const AppStateProvider: FC<PropsWithChildren> = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    setItem(JSON.stringify(state))
-      .then((resp) => console.log(resp, "saved", state))
-      .catch(console.log);
+    setItem(JSON.stringify(state)).catch(console.log);
   }, [state]);
 
   return <ctx.Provider value={{ state, dispatch }}>{children}</ctx.Provider>;

@@ -315,7 +315,7 @@ const EditableReceiptView: FC<{ receipt: TReceipt; onSave: () => void }> = ({ re
         ) : (
           <TouchableOpacity
             onPress={() => openCustomerModal()}
-            style={tw`flex flex-row justify-center items-center my-4`}
+            style={tw`flex flex-row justify-center items-center my-8`}
           >
             <Text style={tw`text-gray-400`}>Tap here to add a customer</Text>
             <FontAwesome5 name="plus-circle" size={12} style={tw`mx-1 text-blue-600`} />
@@ -341,11 +341,6 @@ const EditableReceiptView: FC<{ receipt: TReceipt; onSave: () => void }> = ({ re
                 <Text style={tw`font-bold text-xs w-2/12 text-center`}>Quantity</Text>
                 <Text style={tw`font-bold text-xs w-3/12 text-center`}>Price</Text>
               </View>
-
-              // tw`w-7/12 text-lg`}>{item
-              //   tw`w-2/12 text-center text-lg
-              //   tw`w-3/12 flex justify-center`}>
-              //   tw`text-right text-lg `}>${item.price
             );
           }}
           ListEmptyComponent={() => {
